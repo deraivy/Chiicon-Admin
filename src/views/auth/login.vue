@@ -1,17 +1,15 @@
 <template>
   <div
-    class="bg-gradient-to-br from-blue-50 via-white to-purple-50 h-[90vh] flex items-center justify-center p-4"
+    class="bg-gradient-to-br from-blue-100 via-white to-purple-100 min-h-screen flex items-center justify-center p-4"
   >
     <div class="w-full max-w-md">
       <!-- Login Card -->
-      <div
-        class="bg-white/80 backdrop-blur-lg rounded-2xl shadow-2xl p-8 space-y-8 transition-all duration-500 hover:shadow-xl"
-      >
+      <div class="backdrop-blur-lg rounded-2xl p-8 space-y-8">
         <div class="text-center">
           <h2
             class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
           >
-            Welcome Back
+            Chiicon
           </h2>
           <p class="text-gray-500 mt-2">Please sign in to continue</p>
         </div>

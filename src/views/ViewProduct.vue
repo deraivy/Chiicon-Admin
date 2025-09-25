@@ -1,6 +1,6 @@
 <template>
-  <div class="bg-[#f2f2f2] min-h-screen font-sans">
-    <div class="mx-auto w-full max-w-7xl px-6 py-8 md:py-12 lg:py-16">
+  <div class="bg-[#f1f1f1] min-h-screen font-sans">
+    <div class="w-full mx-auto md:container px-5">
       <!-- Breadcrumb -->
       <div
         class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-12 px-4 md:px-0"

@@ -1,79 +1,180 @@
 <template>
-  <section v-if="route.meta.noNavbar"><router-view /></section>
+  <section>
+    <!-- Loading state -->
+    <section
+      v-if="isLoading"
+      class="h-screen w-screen flex justify-center items-center"
+    >
+      <h2 class="text-2xl">Loading…</h2>
+    </section>
 
-  <section v-else>
-    <div class="fixed">
-      <NavigationDrawer />
-    </div>
-    <!-- Nav -->
-    <div class="w-full" :class="{ 'pl-[250px]': isDrawerVisible }">
-      <div class="bg-white shadow-lg font-sans">
-        <div
-          class="mx-auto w-full max-w-7xl px-4 sm:px-5 py-6 md:px-10 md:py-12 lg:py-6"
-        >
-          <nav class="flex justify-between items-center">
-            <!-- Logo -->
-            <div>
-              <router-link to="/" class="text-xl font-bold uppercase"
-                >Chi~icon</router-link
-              >
-            </div>
+    <!-- Main content -->
+    <section v-else class="flex h-screen bg-gray-100">
+      <!-- Only show sidebar & topbar if user is logged in -->
+      <template v-if="isLoggedIn && !route.meta.noNavbar">
+        <!-- Sidebar for desktop -->
+        <aside class="hidden lg:block">
+          <NavigationDrawer :isOpen="true" />
+        </aside>
 
-            <!-- Cart & Login (Desktop) -->
-            <div class="flex items-center space-x-6">
-              <div class="relative">
-                <router-link
-                  to="/login"
-                  class="cursor-pointer hover:text-red-600"
-                >
-                </router-link>
-              </div>
-
-              <router-link
-                to="/register"
-                class="cursor-pointer hover:text-red-600"
-                >Login</router-link
-              >
-
-              <div class="flex items-center">
-                <img
-                  class="h-8 w-8 rounded-full"
-                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                  alt=""
-                />
-                <div class="ml-3">
-                  <p class="text-sm font-medium text-gray">Tom Cook</p>
-                  <p class="text-xs text-gray-400">View profile</p>
-                </div>
-              </div>
-            </div>
-          </nav>
+        <!-- Mobile Drawer -->
+        <div v-if="drawerModal" class="fixed inset-0 z-50 flex">
+          <div class="flex-1 bg-black/50" @click="closeNavDrawer"></div>
+          <div class="w-64 bg-gray-900 text-white shadow-lg">
+            <NavigationDrawer
+              :isOpen="true"
+              :isMobileOpen="true"
+              @close-drawer="closeNavDrawer"
+            />
+          </div>
         </div>
+      </template>
+
+      <!-- Main Content -->
+      <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Topbar -->
+        <header
+          v-if="isLoggedIn && !route.meta.noNavbar"
+          class="flex items-center bg-white px-4 py-3 shadow-sm sticky top-0 z-20"
+        >
+          <button @click="openNavDrawer" class="lg:hidden">
+            <AppIcon icon="mdi:menu" class="w-6 h-6 text-pink-900" />
+          </button>
+
+          <div class="relative flex items-center ml-auto">
+            <div
+              @click="toggleDropdown"
+              class="flex items-center gap-3 cursor-pointer select-none"
+            >
+              <img
+                :src="profile?.img_str || '/icons/avatar.svg'"
+                class="h-8 w-8 rounded-full border object-cover"
+                alt="profile"
+              />
+              <div class="hidden sm:block">
+                <p class="font-semibold text-gray-800 text-sm">
+                  {{ profile.first_name }} {{ profile.last_name }}
+                </p>
+                <p class="text-gray-600 text-xs">
+                  {{ profile.is_admin ? "Admin" : "User" }}
+                </p>
+              </div>
+              <AppIcon
+                icon="majesticons:chevron-down-line"
+                class="w-8 h-8 text-green-700"
+              />
+            </div>
+
+            <div
+              v-if="showDropdown"
+              class="absolute right-0 top-10 mt-2 w-48 p-2.5 rounded-md shadow bg-white text-gray-700 z-50"
+            >
+              <div @click="openAccountInfo" class="menu-item">
+                Account Information
+              </div>
+              <div @click="openPasswordModal" class="menu-item">
+                Change Password
+              </div>
+              <div @click="logOut" class="menu-item text-red-600">Logout</div>
+            </div>
+          </div>
+        </header>
+
+        <!-- Page Content -->
+        <main class="flex-1 overflow-y-auto p-5">
+          <router-view />
+        </main>
       </div>
-      <router-view />
-    </div>
+    </section>
   </section>
 </template>
 
 <script>
-import { ref } from "vue";
-import { useRoute } from "vue-router";
-import NavigationDrawer from "../src/components/NavigationDrawer.vue";
+import { ref, onMounted } from "vue";
+import NavigationDrawer from "./components/NavigationDrawer.vue";
+import { getAdmin } from "./services/auth.auth.service";
+import { useRouter, useRoute } from "vue-router";
+
 export default {
+  name: "App",
   components: { NavigationDrawer },
   setup() {
     const route = useRoute();
-    const isDrawerVisible = ref(true);
+    const router = useRouter();
 
-    return { route, isDrawerVisible };
+    const isLoading = ref(true);
+    const isLoggedIn = ref(false);
+    const drawerModal = ref(false);
+    const profile = ref({});
+    const showDropdown = ref(false);
+
+    const openNavDrawer = () => (drawerModal.value = true);
+    const closeNavDrawer = () => (drawerModal.value = false);
+    const toggleDropdown = () => (showDropdown.value = !showDropdown.value);
+
+    const fetchAdmin = async () => {
+      try {
+        const response = await getAdmin();
+        if (response.status === 200) {
+          profile.value = response.data.admin;
+          isLoggedIn.value = true;
+        } else {
+          logOut();
+        }
+      } catch (error) {
+        logOut();
+      } finally {
+        isLoading.value = false;
+      }
+    };
+
+    const logOut = () => {
+      sessionStorage.clear();
+      isLoggedIn.value = false;
+      router.push("/");
+    };
+
+    const openAccountInfo = () => console.log("Open Account Info modal");
+    const openPasswordModal = () => console.log("Open Change Password modal");
+
+    onMounted(() => {
+      const sessionData = sessionStorage.getItem("sessionData");
+      if (sessionData) {
+        fetchAdmin();
+      } else {
+        isLoading.value = false;
+      }
+    });
+
+    return {
+      isLoading,
+      isLoggedIn,
+      drawerModal,
+      showDropdown,
+      openNavDrawer,
+      closeNavDrawer,
+      toggleDropdown,
+      fetchAdmin,
+      logOut,
+      openAccountInfo,
+      openPasswordModal,
+      profile,
+      route,
+    };
   },
 };
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.menu-item {
+  @apply px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm;
+}
+.slide-left-enter-active,
+.slide-left-leave-active {
+  transition: transform 0.3s ease;
+}
+.slide-left-enter-from,
+.slide-left-leave-to {
+  transform: translateX(-100%);
 }
 </style>

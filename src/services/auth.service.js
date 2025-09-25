@@ -26,13 +26,15 @@ export const delCategory = async (categoryId) => {
 };
 
 // all products
-export const allProducts = async ({
-  page = 1,
-  per_page = 30,
-  sort = "created_at:desc",
-} = {}) => {
+export const allProducts = async ({ page = 1, per_page = 30 } = {}) => {
   return await axiosGet(
-    `/api/v1/admin/all_products?page=${page}&per_page=${per_page}&sort=${sort}`
+    `/api/v1/admin/all_products?page=${page}&per_page=${per_page}`
+  );
+};
+
+export const search = async (query) => {
+  return await axiosGet(
+    `/api/v1/products/search?query=${encodeURIComponent(query)}`
   );
 };
 
@@ -53,6 +55,11 @@ export const delProduct = async (productId) => {
 
 export const getSingleProduct = async (productId) => {
   return await axiosGet(`/api/v1/admin/single_product/${productId}`);
+};
+
+// dashboard
+export const dashboard = async (data) => {
+  return await axiosGet("/api/v1/admin/dashboard", data);
 };
 
 export const uploadImage = async (data) => {

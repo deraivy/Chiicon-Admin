@@ -9,14 +9,14 @@ import Products from "@/views/Products.vue";
 import AddProduct from "@/views/addProduct.vue";
 import ViewProduct from "@/views/ViewProduct.vue";
 import EditProduct from "@/views/EditProduct.vue";
+import Customers from "@/views/Customers.vue";
+import ViewCustomer from "@/views/viewCustomer.vue";
+import SingleOrder from "@/views/singleOrder.vue";
+import Invoice from "@/components/invoice.vue";
 
 const routes = [
   {
     path: "/",
-    redirect: "/login",
-  },
-  {
-    path: "/login",
     name: "login",
     component: Login,
     meta: { noNavbar: true },
@@ -71,6 +71,32 @@ const routes = [
     name: "editproduct",
     component: EditProduct,
     meta: { requiresAuth: true, noNavbar: false },
+  },
+  {
+    path: "/customers",
+    name: "customers",
+    component: Customers,
+    meta: { requiresAuth: true, noNavbar: false },
+  },
+  {
+    path: "/viewcustomer/:id",
+    name: "viewcustomer",
+    component: ViewCustomer,
+    meta: { requiresAuth: true, noNavbar: false },
+  },
+  {
+    path: "/order/:id",
+    name: "order",
+    component: SingleOrder,
+    meta: { requiresAuth: true, noNavbar: false },
+    props: true,
+  },
+  {
+    path: "/invoice/:id",
+    name: "invoice",
+    component: Invoice,
+    meta: { requiresAuth: true, noNavbar: false },
+    props: true,
   },
 ];
 

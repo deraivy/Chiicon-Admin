@@ -1,69 +1,15 @@
 <template>
-  <div class="bg-[#f7f7f7] min-h-screen">
-    <div class="mx-auto w-full max-w-6xl px-5 py-6 md:px-0 md:py-12 lg:py-6">
-      <!-- Header Section -->
-      <div class="flex justify-between items-center mb-8 px-4 md:px-6">
-        <h2
-          class="text-base md:text-lg font-bold text-gray-800 tracking-tight uppercase"
-        >
-          Add Product
-        </h2>
-        <nav class="flex items-center text-gray-600" aria-label="Breadcrumb">
-          <ol class="inline-flex items-center space-x-2 md:space-x-3">
-            <li class="flex items-center">
-              <router-link
-                to="/dashboard"
-                class="flex items-center text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors duration-150"
-                >Home</router-link
-              >
-            </li>
-            <li>
-              <svg
-                class="w-4 h-4 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M9 5l7 7-7 7"
-                ></path>
-              </svg>
-            </li>
-            <li class="flex items-center">
-              <router-link
-                to="/products"
-                class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors duration-150"
-                >Products</router-link
-              >
-            </li>
-            <li>
-              <svg
-                class="w-4 h-4 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M9 5l7 7-7 7"
-                ></path>
-              </svg>
-            </li>
-            <li class="flex items-center">
-              <span class="text-sm font-medium text-gray-800">Add Product</span>
-            </li>
-          </ol>
-        </nav>
-      </div>
+  <div class="bg-[#f1f1f1] min-h-screen">
+    <div class="w-full mx-auto md:container px-5">
+      <Header
+        :title="'Add Product'"
+        :subTitle="'Product Overview'"
+        class="mb-12"
+      />
 
       <!-- Form Section -->
       <div v-if="productData">
-        <form @submit.prevent="addP" class="p-6 md:p-8 space-y-8">
+        <form @submit.prevent="addP" class="space-y-8">
           <!-- Product Info Section -->
           <div class="space-y-6 bg-white pb-6 rounded-lg">
             <div class="p-4 border-b border-gray-200 bg-white rounded-t-lg">
@@ -113,7 +59,7 @@
                 <label
                   for="price"
                   class="block text-sm font-medium text-gray-700 mb-2"
-                  >Price (₦)</label
+                  >Price ($)</label
                 >
                 <input
                   v-model="productData.price"
@@ -374,9 +320,10 @@ import { ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { addProduct, allCategory, uploadImage } from "@/services/auth.service";
 import { useToast } from "vue-toastification";
-
+import Header from "@/components/Header.vue";
 export default {
   name: "AddProductView",
+  components: { Header },
   setup() {
     const router = useRouter();
     const toast = useToast();
@@ -463,8 +410,8 @@ export default {
     };
 
     const removePhoto = () => (productData.image = "");
-    const removeAdditionalImage = (n) =>
-      (productData[`additionalImage${n}`] = "");
+    const removeAdditionalImage = () =>
+      (productData[`additionalImage${additionalInputs.length}`] = "");
     const addSpec = () =>
       productData.specifications.push({ name: "", description: "" });
     const removeSpec = (index) => productData.specifications.splice(index, 1);
@@ -490,7 +437,7 @@ export default {
           ].filter(Boolean),
         };
 
-        const res = await addProduct(payload); // payload = your form data
+        const res = await addProduct(payload);
         router.push({
           path: "/products",
           state: { newProduct: res.data.data },

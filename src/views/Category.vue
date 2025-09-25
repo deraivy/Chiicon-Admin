@@ -1,78 +1,102 @@
 <template>
   <div>
-    <div
-      class="w-full bg-gray-100 flex items-center justify-center min-h-screen p-4 md:p-6"
-    >
-      <div class="container max-w-2xl">
-        <div
-          class="bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all duration-300 hover:shadow-2xl"
-        >
-          <!-- Table Header -->
+    <div class="bg-[] h-screen p-6">
+      <Header :title="'Categories'" :subTitle="'Overview'" class="mb-6" />
+
+      <div class="">
+        <div class="bg-white rounded-2xl overflow-hidden">
           <div
-            class="p-6 md:p-8 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white"
+            class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 p-6"
           >
-            <div
-              class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-            >
-              <div>
-                <h2
-                  class="text-2xl md:text-3xl font-bold text-gray-800 tracking-tight"
-                >
-                  Categories
-                </h2>
-                <p class="mt-1 text-sm text-gray-500">
-                  Manage your categories effortlessly
-                </p>
-              </div>
-              <div class="mt-4 md:mt-0">
-                <button
-                  @click="openAddModal"
-                  class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-6 rounded-lg transition-all duration-200 ease-in-out shadow-md hover:shadow-lg flex items-center gap-2"
-                >
-                  <ion-icon name="add-outline" class="w-5 h-5"></ion-icon>
-                  Add Category
-                </button>
-              </div>
+            <div class="relative max-w-2xl w-full">
+              <input
+                placeholder="Search by product code..."
+                type="search"
+                class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none text-base"
+              />
+              <ion-icon
+                name="search-outline"
+                class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              ></ion-icon>
+            </div>
+            <div class="flex items-center gap-3">
+              <!-- Add Product -->
+              <button
+                @click="openAddModal"
+                class="px-4 py-2 rounded-full bg-green-600 text-white hover:bg-green-700 transition text-sm font-medium shadow"
+              >
+                + Add Category
+              </button>
+            </div>
+          </div>
+
+          <!-- Loading Skeleton -->
+          <div v-if="isLoadingCategories" class="animate-pulse">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200 p-6">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-4">
+                      <div class="h-4 bg-gray-200 rounded w-8"></div>
+                    </th>
+                    <th class="px-6 py-4">
+                      <div class="h-4 bg-gray-200 rounded w-24"></div>
+                    </th>
+                    <th class="px-6 py-4 text-right">
+                      <div class="h-4 bg-gray-200 rounded w-16"></div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <tr v-for="n in 5" :key="n">
+                    <td class="px-6 py-4">
+                      <div class="h-8 w-8 bg-gray-200 rounded-full"></div>
+                    </td>
+                    <td class="px-6 py-4">
+                      <div class="h-4 bg-gray-200 rounded w-32"></div>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                      <div class="flex justify-end gap-2">
+                        <div class="h-6 bg-gray-200 rounded w-12"></div>
+                        <div class="h-6 bg-gray-200 rounded w-12"></div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
           <!-- Table -->
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th
-                    class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
-                  >
-                    Image
-                  </th>
-                  <th
-                    class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
-                  >
-                    Name
-                  </th>
-                  <th
-                    class="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider"
-                  >
-                    Actions
-                  </th>
+          <div v-else class="overflow-x-auto bg-white rounded-lg shadow px-6">
+            <table
+              class="w-full table-auto border-2 border-blue-500 rounded-lg overflow-hidden mx-auto"
+            >
+              <thead>
+                <tr
+                  class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal"
+                >
+                  <th class="py-3 px-6 text-left">#</th>
+                  <th class="py-3 px-6 text-left">Icon</th>
+                  <th class="py-3 px-6 text-left">Name</th>
+                  <th class="py-3 px-6 text-center">Actions</th>
                 </tr>
               </thead>
-
-              <tbody class="bg-white divide-y divide-gray-200">
+              <tbody class="text-gray-600 text-sm">
                 <tr
-                  v-for="category in categories"
+                  v-for="(category, index) in categories"
                   :key="category.id"
-                  class="hover:bg-gray-50 transition-all duration-150 ease-in-out"
+                  class="border-b border-gray-200 hover:bg-gray-100"
                 >
-                  <td class="px-6 py-4 whitespace-nowrap">
+                  <td class="py-3 px-6 text-left">{{ index + 1 }}</td>
+                  <td class="py-3 px-6 text-left">
                     <img
                       :src="category.image || '/icons/camera.svg'"
                       alt="Category Image"
-                      class="h-12 w-12 rounded object-cover border"
+                      class="h-8 w-8 rounded object-cover border"
                     />
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
+                  <td v-if="!category.isEditing" class="py-3 px-6 text-left">
                     <div
                       v-if="!category.isEditing"
                       class="text-sm font-medium text-gray-900"
@@ -83,19 +107,17 @@
                       v-else
                       v-model="category.editedName"
                       type="text"
-                      class="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                      class="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                       @keyup.enter="saveEdit(category)"
                       placeholder="Enter category name"
                     />
                   </td>
 
-                  <td
-                    class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
-                  >
+                  <td class="py-3 px-6 text-center">
                     <button
                       v-if="!category.isEditing"
                       @click="toggleEdit(category)"
-                      class="text-indigo-600 hover:text-indigo-800 mr-4 transition-colors duration-150"
+                      class="text-green-600 hover:text-green-800 mr-4 transition-colors duration-150"
                     >
                       Edit
                     </button>
@@ -121,7 +143,7 @@
 
           <!-- Empty State -->
           <div
-            v-if="categories.length === 0"
+            v-if="!isLoadingCategories && categories.length === 0"
             class="p-6 text-center text-gray-500 bg-gray-50 border-t border-gray-200"
           >
             <svg
@@ -153,84 +175,103 @@
       @click.self="closeAddModal"
     >
       <div
-        class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 md:p-8 transform transition-all duration-300 scale-100"
+        class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 md:p-8 transform transition-all duration-300 scale-100"
       >
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-xl font-bold text-gray-800">Add Category</h3>
+        <!-- Modal Header -->
+        <div class="flex justify-between items-start mb-6">
+          <div>
+            <h3 class="text-2xl font-bold text-gray-800">Add Category</h3>
+            <p class="mt-1 text-sm text-gray-500">
+              Add your product category and necessary information from here
+            </p>
+          </div>
           <button
             @click="closeAddModal"
             class="text-gray-500 hover:text-gray-700 transition-colors duration-150"
           >
-            <ion-icon name="close-outline" class="w-6 h-6"></ion-icon>
+            <ion-icon
+              name="close-outline"
+              class="w-6 h-6 p-2 bg-white shadow-md hover:bg-red-100 hover:text-red-600 rounded-full"
+            ></ion-icon>
           </button>
         </div>
-        <form @submit.prevent="add">
-          <div class="mb-6">
-            <label
-              for="categoryName"
-              class="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Category Name
-            </label>
 
-            <!-- Single Image Upload -->
-            <div
-              class="border-2 border-gray shadow-inner rounded-lg self-start mb-4"
+        <!-- Form -->
+        <form @submit.prevent="add" class="space-y-6">
+          <!-- Name -->
+          <div>
+            <label for="name" class="block text-sm font-medium text-gray-700"
+              >Name</label
             >
-              <div class="border-b border-grey-shades py-4 pl-5">
-                <h3 class="font-bold capitalize text-lg 2xl:text-lg mb-3">
-                  Product Image <span class="text-error">*</span>
-                </h3>
-                <p class="text-xs 2xl:text-sm">Upload one image</p>
-              </div>
-              <div class="p-4 flex justify-center">
-                <label
-                  for="file-upload"
-                  class="hover:cursor-pointer flex flex-col items-center"
-                >
-                  <input
-                    id="file-upload"
-                    type="file"
-                    accept="image/*"
-                    class="hidden"
-                    @change="imageChange"
-                  />
-                  <div
-                    class="relative h-[150px] w-[150px] rounded-md max-w-full border flex items-center justify-center"
-                  >
-                    <div
-                      v-if="isImageLoading"
-                      class="absolute inset-0 flex items-center justify-center bg-gray-200 bg-opacity-50"
-                    >
-                      <span class="image-loader"></span>
-                    </div>
-                    <img
-                      v-else
-                      :src="formData.image || '/icons/camera.svg'"
-                      alt="Uploaded Image"
-                      class="h-[100px] w-[100px] object-cover"
-                    />
-                    <div
-                      class="absolute top-0 left-0 h-full w-full bg-grey-shades bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100"
-                    >
-                      <p class="text-center">Click</p>
-                    </div>
-                  </div>
-                </label>
-              </div>
-            </div>
-
             <input
               v-model="formData.name"
               type="text"
-              id="categoryName"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+              id="name"
+              class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
               placeholder="Enter category name"
               required
             />
           </div>
 
-          <div class="flex justify-end gap-3">
+          <!-- Category Image -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Category Image</label
+            >
+            <div
+              class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-green-400 transition"
+            >
+              <input
+                type="file"
+                id="file-upload"
+                accept="image/*"
+                class="hidden"
+                @change="imageChange"
+              />
+              <label for="file-upload" class="flex flex-col items-center">
+                <div v-if="!formData.image" class="text-gray-500">
+                  Drag your images here
+                  <p class="text-xs mt-1 text-gray-400">
+                    (Only *.jpeg, *.webp and *.png images will be accepted)
+                  </p>
+                </div>
+                <div v-else class="relative inline-block">
+                  <img
+                    :src="formData.image"
+                    alt="Uploaded Image"
+                    class="h-24 w-24 object-cover rounded border"
+                  />
+                  <button
+                    type="button"
+                    @click="formData.image = ''"
+                    class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full p-1 hover:bg-red-700"
+                  >
+                    <ion-icon name="close-outline" class="w-4 h-4"></ion-icon>
+                  </button>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Published -->
+          <div class="flex items-center">
+            <label class="mr-3 text-sm font-medium text-gray-700"
+              >Published</label
+            >
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                v-model="formData.published"
+                class="sr-only peer"
+              />
+              <div
+                class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-green-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"
+              ></div>
+            </label>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex justify-end gap-3 pt-4">
             <button
               type="button"
               @click="closeAddModal"
@@ -240,7 +281,7 @@
             </button>
             <button
               type="submit"
-              class="py-2 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all duration-200 flex items-center gap-2"
+              class="py-2 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 flex items-center gap-2"
               :disabled="isLoading"
             >
               <ion-icon
@@ -248,7 +289,7 @@
                 name="refresh-outline"
                 class="w-4 h-4 animate-spin"
               ></ion-icon>
-              {{ isLoading ? "Adding..." : "Add" }}
+              {{ isLoading ? "Adding..." : "Add Category" }}
             </button>
           </div>
         </form>
@@ -314,14 +355,17 @@ import {
   delCategory,
   uploadImage,
 } from "@/services/auth.service";
+import Header from "@/components/Header.vue";
 
 export default {
   name: "CategoryView",
+  components: { Header },
   setup() {
     const toast = useToast();
     const categories = ref([]);
     const formData = ref({ name: "", image: "" });
     const isLoading = ref(false);
+    const isLoadingCategories = ref(true);
     const isAddModalOpen = ref(false);
     const isDeleteModalOpen = ref(false);
     const deletingCategory = ref(null);
@@ -362,6 +406,7 @@ export default {
 
     const fetchCategories = async () => {
       try {
+        isLoadingCategories.value = true; // Set loading to true
         const response = await allCategory();
         categories.value = response.data.categories.map((cat) => ({
           ...cat,
@@ -371,6 +416,8 @@ export default {
         }));
       } catch {
         toast.error("Failed to load categories");
+      } finally {
+        isLoadingCategories.value = false; // Always set loading to false
       }
     };
 
@@ -490,13 +537,16 @@ export default {
       isDeleting.value = false;
     };
 
-    onMounted(fetchCategories);
+    onMounted(() => {
+      fetchCategories();
+    });
 
     return {
       categories,
       formData,
       isAddModalOpen,
       isLoading,
+      isLoadingCategories, // Add to return
       openAddModal,
       closeAddModal,
       add,
@@ -518,6 +568,13 @@ export default {
 /* Subtle gradient on table row hover */
 tbody tr:hover {
   background: linear-gradient(to right, #f9fafb, #f1f5f9);
+}
+
+/* Enhanced skeleton animation */
+.animate-pulse {
+  animation-duration: 1.5s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
 }
 
 /* Modal backdrop blur (optional, requires Tailwind config support) */
