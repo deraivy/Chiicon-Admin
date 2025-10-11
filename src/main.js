@@ -8,6 +8,8 @@ import "vue-awesome-paginate/dist/style.css";
 import { Icon } from "@iconify/vue";
 import Popper from "vue3-popper";
 import { createPinia } from "pinia";
+import "animate.css";
+
 const pinia = createPinia();
 
 const toastOptions = {

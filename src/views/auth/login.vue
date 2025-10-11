@@ -1,13 +1,11 @@
 <template>
-  <div
-    class="bg-gradient-to-br from-blue-100 via-white to-purple-100 min-h-screen flex items-center justify-center p-4"
-  >
+  <div class="min-h-screen flex items-center justify-center p-4">
     <div class="w-full max-w-md">
       <!-- Login Card -->
       <div class="backdrop-blur-lg rounded-2xl p-8 space-y-8">
         <div class="text-center">
           <h2
-            class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+            class="text-3xl font-bold bg-gradient-to-r from-gray-400 to-[#1ca25e] bg-clip-text text-transparent"
           >
             Chiicon
           </h2>
@@ -26,7 +24,7 @@
             <div class="relative">
               <input
                 v-model="formData.email"
-                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50"
+                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 bg-white/50"
                 type="email"
                 id="email"
                 placeholder="Enter your email"
@@ -47,7 +45,7 @@
               <input
                 :type="showPassword ? 'text' : 'password'"
                 v-model="formData.password"
-                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50"
+                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 bg-white/50"
                 id="password"
                 placeholder="Enter your password"
                 required
@@ -61,7 +59,7 @@
               <input
                 type="checkbox"
                 id="remember"
-                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
               />
               <label class="ml-2 text-gray-600 text-sm" for="remember">
                 Remember me
@@ -69,7 +67,7 @@
             </div>
             <a
               href="#"
-              class="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200"
+              class="text-sm text-green-600 hover:text-green-800 font-medium transition-colors duration-200"
               >Forgot password?</a
             >
           </div>
@@ -77,7 +75,7 @@
           <button
             type="submit"
             :disabled="isLoading || !isFormValid"
-            class="w-full flex justify-center py-3 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 focus:outline-none focus:ring focus:ring-offset"
+            class="w-full flex justify-center py-3 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-[#1ca25e] hover:opacity-90 focus:outline-none focus:ring focus:ring-offset"
           >
             <span v-if="!isLoading">Sign In</span>
             <span v-else class="flex items-center">
@@ -111,7 +109,7 @@
           Don't have an account?
           <router-link
             to="/register"
-            class="text-blue-600 hover:text-blue-800 font-semibold transition-colors duration-200"
+            class="text-green-600 hover:text-green-800 font-semibold transition-colors duration-200"
             >Sign up</router-link
           >
         </p>

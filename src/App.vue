@@ -10,17 +10,18 @@
 
     <!-- Main content -->
     <section v-else class="flex h-screen bg-gray-100">
-      <!-- Only show sidebar & topbar if user is logged in -->
       <template v-if="isLoggedIn && !route.meta.noNavbar">
-        <!-- Sidebar for desktop -->
         <aside class="hidden lg:block">
           <NavigationDrawer :isOpen="true" />
         </aside>
 
-        <!-- Mobile Drawer -->
-        <div v-if="drawerModal" class="fixed inset-0 z-50 flex">
-          <div class="flex-1 bg-black/50" @click="closeNavDrawer"></div>
-          <div class="w-64 bg-gray-900 text-white shadow-lg">
+        <div v-if="drawerModal" class="fixed inset-0 z-50">
+          <div
+            class="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            @click="closeNavDrawer"
+          ></div>
+
+          <div class="absolute top-0 left-0">
             <NavigationDrawer
               :isOpen="true"
               :isMobileOpen="true"
@@ -32,7 +33,6 @@
 
       <!-- Main Content -->
       <div class="flex-1 flex flex-col overflow-hidden">
-        <!-- Topbar -->
         <header
           v-if="isLoggedIn && !route.meta.noNavbar"
           class="flex items-center bg-white px-4 py-3 shadow-sm sticky top-0 z-20"

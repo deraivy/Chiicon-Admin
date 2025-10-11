@@ -1,169 +1,162 @@
 <template>
-  <div>
-    <div class="bg-[] h-screen p-6">
-      <Header :title="'Categories'" :subTitle="'Overview'" class="mb-6" />
+  <div class="w-full mx-auto md:container px-5">
+    <div
+      class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 bg-white p-6 rounded-xl shadow-sm border border-gray-100"
+    >
+      <!-- Header Text -->
+      <div class="mb-4 sm:mb-0">
+        <Header :title="'Categories'" :subTitle="'Overview'" class="" />
+      </div>
 
-      <div class="">
-        <div class="bg-white rounded-2xl overflow-hidden">
-          <div
-            class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 p-6"
-          >
-            <div class="relative max-w-2xl w-full">
-              <input
-                placeholder="Search by product code..."
-                type="search"
-                class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none text-base"
-              />
-              <ion-icon
-                name="search-outline"
-                class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-              ></ion-icon>
-            </div>
-            <div class="flex items-center gap-3">
-              <!-- Add Product -->
-              <button
-                @click="openAddModal"
-                class="px-4 py-2 rounded-full bg-green-600 text-white hover:bg-green-700 transition text-sm font-medium shadow"
-              >
-                + Add Category
-              </button>
-            </div>
-          </div>
+      <!-- Controls -->
+      <div
+        class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto"
+      >
+        <button
+          @click="openAddModal"
+          class="px-4 py-2 rounded-full bg-[#1ca25f] text-white hover:bg-[#17854f] transition-all duration-200 text-sm font-medium shadow-sm hover:shadow-md flex items-center justify-center gap-2"
+        >
+          <i class="fas fa-plus"></i>
+          Add Product
+        </button>
+      </div>
+    </div>
 
-          <!-- Loading Skeleton -->
-          <div v-if="isLoadingCategories" class="animate-pulse">
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200 p-6">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th class="px-6 py-4">
-                      <div class="h-4 bg-gray-200 rounded w-8"></div>
-                    </th>
-                    <th class="px-6 py-4">
-                      <div class="h-4 bg-gray-200 rounded w-24"></div>
-                    </th>
-                    <th class="px-6 py-4 text-right">
-                      <div class="h-4 bg-gray-200 rounded w-16"></div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                  <tr v-for="n in 5" :key="n">
-                    <td class="px-6 py-4">
-                      <div class="h-8 w-8 bg-gray-200 rounded-full"></div>
-                    </td>
-                    <td class="px-6 py-4">
-                      <div class="h-4 bg-gray-200 rounded w-32"></div>
-                    </td>
-                    <td class="px-6 py-4 text-right">
-                      <div class="flex justify-end gap-2">
-                        <div class="h-6 bg-gray-200 rounded w-12"></div>
-                        <div class="h-6 bg-gray-200 rounded w-12"></div>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- Table -->
-          <div v-else class="overflow-x-auto bg-white rounded-lg shadow px-6">
-            <table
-              class="w-full table-auto border-2 border-blue-500 rounded-lg overflow-hidden mx-auto"
-            >
-              <thead>
-                <tr
-                  class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal"
-                >
-                  <th class="py-3 px-6 text-left">#</th>
-                  <th class="py-3 px-6 text-left">Icon</th>
-                  <th class="py-3 px-6 text-left">Name</th>
-                  <th class="py-3 px-6 text-center">Actions</th>
+    <div class="">
+      <div class="bg-white rounded-2xl overflow-hidden">
+        <!-- Loading Skeleton -->
+        <div v-if="isLoadingCategories" class="animate-pulse">
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 p-6">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-4">
+                    <div class="h-4 bg-gray-200 rounded w-8"></div>
+                  </th>
+                  <th class="px-6 py-4">
+                    <div class="h-4 bg-gray-200 rounded w-24"></div>
+                  </th>
+                  <th class="px-6 py-4 text-right">
+                    <div class="h-4 bg-gray-200 rounded w-16"></div>
+                  </th>
                 </tr>
               </thead>
-              <tbody class="text-gray-600 text-sm">
-                <tr
-                  v-for="(category, index) in categories"
-                  :key="category.id"
-                  class="border-b border-gray-200 hover:bg-gray-100"
-                >
-                  <td class="py-3 px-6 text-left">{{ index + 1 }}</td>
-                  <td class="py-3 px-6 text-left">
-                    <img
-                      :src="category.image || '/icons/camera.svg'"
-                      alt="Category Image"
-                      class="h-8 w-8 rounded object-cover border"
-                    />
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr v-for="n in 5" :key="n">
+                  <td class="px-6 py-4">
+                    <div class="h-8 w-8 bg-gray-200 rounded-full"></div>
                   </td>
-                  <td v-if="!category.isEditing" class="py-3 px-6 text-left">
-                    <div
-                      v-if="!category.isEditing"
-                      class="text-sm font-medium text-gray-900"
-                    >
-                      {{ category.name }}
+                  <td class="px-6 py-4">
+                    <div class="h-4 bg-gray-200 rounded w-32"></div>
+                  </td>
+                  <td class="px-6 py-4 text-right">
+                    <div class="flex justify-end gap-2">
+                      <div class="h-6 bg-gray-200 rounded w-12"></div>
+                      <div class="h-6 bg-gray-200 rounded w-12"></div>
                     </div>
-                    <input
-                      v-else
-                      v-model="category.editedName"
-                      type="text"
-                      class="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
-                      @keyup.enter="saveEdit(category)"
-                      placeholder="Enter category name"
-                    />
-                  </td>
-
-                  <td class="py-3 px-6 text-center">
-                    <button
-                      v-if="!category.isEditing"
-                      @click="toggleEdit(category)"
-                      class="text-green-600 hover:text-green-800 mr-4 transition-colors duration-150"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      v-else
-                      @click="saveEdit(category)"
-                      class="text-green-600 hover:text-green-800 mr-4 transition-colors duration-150"
-                      :disabled="category.isSaving"
-                    >
-                      {{ category.isSaving ? "Saving..." : "Save" }}
-                    </button>
-                    <button
-                      @click="openDeleteModal(category)"
-                      class="text-red-600 hover:text-red-800 transition-colors duration-150"
-                    >
-                      Delete
-                    </button>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
+        </div>
 
-          <!-- Empty State -->
-          <div
-            v-if="!isLoadingCategories && categories.length === 0"
-            class="p-6 text-center text-gray-500 bg-gray-50 border-t border-gray-200"
+        <!-- Table -->
+        <div v-else class="overflow-x-auto bg-white rounded-lg shadow p-6">
+          <table
+            class="w-full table-auto border-2 border-blue-500 rounded-lg overflow-hidden mx-auto"
           >
-            <svg
-              class="mx-auto h-12 w-12 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-              />
-            </svg>
-            <p class="mt-2 text-sm">
-              No categories found. Add one to get started!
-            </p>
-          </div>
+            <thead>
+              <tr
+                class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal"
+              >
+                <th class="py-3 px-6 text-left">#</th>
+                <th class="py-3 px-6 text-left">Icon</th>
+                <th class="py-3 px-6 text-left">Name</th>
+                <th class="py-3 px-6 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="text-gray-600 text-sm">
+              <tr
+                v-for="(category, index) in categories"
+                :key="category.id"
+                class="border-b border-gray-200 hover:bg-gray-100"
+              >
+                <td class="py-3 px-6 text-left">{{ index + 1 }}</td>
+                <td class="py-3 px-6 text-left">
+                  <img
+                    :src="category.image || '/icons/camera.svg'"
+                    alt="Category Image"
+                    class="h-8 w-8 rounded object-cover border"
+                  />
+                </td>
+                <td class="py-3 px-6 text-left">
+                  <p
+                    v-if="!category.isEditing"
+                    class="text-sm font-medium text-gray-900"
+                  >
+                    {{ category.name }}
+                  </p>
+                  <input
+                    v-else
+                    v-model="category.editedName"
+                    type="text"
+                    class="w-full px-3 py-1.5 border border-blue-500 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                    @keyup.enter="saveEdit(category)"
+                    placeholder="Enter category name"
+                  />
+                </td>
+
+                <td class="py-3 px-6 text-center">
+                  <button
+                    v-if="!category.isEditing"
+                    @click="toggleEdit(category)"
+                    class="text-green-600 hover:text-green-800 mr-4 transition-colors duration-150"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    v-else
+                    @click="saveEdit(category)"
+                    class="text-green-600 hover:text-green-800 mr-4 transition-colors duration-150"
+                    :disabled="category.isSaving"
+                  >
+                    {{ category.isSaving ? "Saving..." : "Save" }}
+                  </button>
+                  <button
+                    @click="openDeleteModal(category)"
+                    class="text-red-600 hover:text-red-800 transition-colors duration-150"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty State -->
+        <div
+          v-if="!isLoadingCategories && categories.length === 0"
+          class="p-6 text-center text-gray-500 bg-gray-50 border-t border-gray-200"
+        >
+          <svg
+            class="mx-auto h-12 w-12 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+            />
+          </svg>
+          <p class="mt-2 text-sm">
+            No categories found. Add one to get started!
+          </p>
         </div>
       </div>
     </div>

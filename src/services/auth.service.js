@@ -65,3 +65,10 @@ export const dashboard = async (data) => {
 export const uploadImage = async (data) => {
   return await axiosPost("/api/v1/cloudinary/manage-image", data);
 };
+
+// all orders
+export const allOrders = async ({ page = 1, per_page = 30 } = {}) => {
+  return await axiosGet(
+    `/api/v1/admin/all_orders?page=${page}&per_page=${per_page}`
+  );
+};

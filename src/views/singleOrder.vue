@@ -1,137 +1,180 @@
 <template>
-  <div class="bg-gray-100 min-h-screen font-sans text-gray-800">
-    <div class="w-full md:container mx-auto px-5">
-      <!-- Header Section -->
-      <div>
-        <button
-          @click="goBack"
-          class="flex items-center mb-4 text-green-600 hover:text-green-800 transition-colors"
-        >
-          <svg
-            class="w-5 h-5 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M15 19l-7-7 7-7"
-            ></path>
-          </svg>
-          Orders
-        </button>
-        <h2 class="text-2xl font-semibold mb-4">Order Details</h2>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div class="col-span-3">
-          <h2 class="text-lg text-green-700 mb-4">Status</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-white flex items-center gap-4 rounded-lg p-6">
-              <div class="border border-green-700 p-2 rounded-full">
-                <AppIcon icon="proicons:tag" class="w-8 h-8 text-green-700" />
-              </div>
-              <div>
-                <p>Order Id</p>
-                <p class="max-w-2xl">{{ order.id }}</p>
-              </div>
-            </div>
-
-            <div class="bg-white flex items-center gap-4 rounded-lg p-6">
-              <div class="border border-green-700 p-2 rounded-full">
-                <AppIcon icon="mdi:account" class="w-8 h-8 text-green-700" />
-              </div>
-              <div>
-                <p>Order Status</p>
-                <p>{{ order.status }}</p>
-              </div>
+  <div class="">
+    <div class="w-full mx-auto md:container px-5">
+      <!-- Header -->
+      <div class="mb-6">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <button
+              @click="$router.back()"
+              class="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <AppIcon
+                icon="material-symbols:arrow-back"
+                class="w-5 h-5 mr-2"
+              />
+              Back
+            </button>
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900">Order Details</h1>
+              <p class="text-gray-600">Order #{{ order.order_number }}</p>
             </div>
           </div>
-          <!-- {{ formatDate(order.created_at) || "Not Provided" }} -->
-          <!-- Cart -->
-          <h2 class="text-lg text-green-700 mt-6 mb-4">Ordered items</h2>
-          <div class="bg-white rounded-lg p-6 mb-4">
-            <div v-if="order.products.length" class="space-y-4">
-              <div
-                v-for="product in order.products"
-                :key="product.id"
-                class="flex items-center justify-between"
-              >
-                <div class="flex items-center">
-                  <img
-                    :src="product.product_image || '/placeholder.png'"
-                    alt="Product Image"
-                    class="w-32 h-24 rounded-lg mr-4"
-                  />
-                  <div>
-                    <p class="font-semibold text-gray-800">
-                      {{ product.product_name || "Not Available" }}
-                    </p>
-                    <p class="text-gray-600">
-                      Quantity: {{ product.quantity || 0 }}
-                    </p>
-                  </div>
-                </div>
-                <p class="font-semibold text-gray-800">
-                  ₦{{ product.amount ? product.amount.toFixed(2) : "0.00" }}
-                </p>
-              </div>
-              <div class="flex justify-end mt-4">
-                <p class="font-semibold text-gray-800">
-                  Total: ₦{{
-                    order.total_amount ? order.total_amount.toFixed(2) : "0.00"
-                  }}
-                </p>
-              </div>
+          <div class="flex items-center space-x-3">
+            <button
+              @click="printOrder"
+              class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            >
+              <AppIcon icon="material-symbols:print" class="w-4 h-4 mr-2" />
+              Print
+            </button>
+            <button
+              v-if="canEditOrder(order.status)"
+              @click="editOrder"
+              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            >
+              <AppIcon icon="material-symbols:edit" class="w-4 h-4 mr-2" />
+              Edit Order
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div v-if="isLoading" class="bg-white rounded-xl shadow-sm p-8">
+        <div class="animate-pulse space-y-6">
+          <div class="h-8 bg-gray-200 rounded w-1/3"></div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+              <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+              <div class="h-4 bg-gray-200 rounded w-1/2"></div>
             </div>
-            <div v-else class="text-gray-500 text-center py-4">
-              No products in this order.
+            <div class="space-y-4">
+              <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+              <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Details -->
+      <div v-else class="space-y-6">
+        <!-- Order Status & Actions -->
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <div
+            class="flex flex-col md:flex-row md:items-center md:justify-between"
+          >
+            <div class="flex items-center space-x-4 mb-4 md:mb-0">
+              <span
+                :class="getStatusBadgeClass(order.status)"
+                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+              >
+                {{ getStatusText(order.status) }}
+              </span>
+              <span class="text-sm text-gray-500">
+                Created {{ formatDate(order.created_at) }}
+              </span>
+            </div>
+            <div class="flex space-x-3">
+              <select
+                v-if="canUpdateStatus(order.status)"
+                v-model="newStatus"
+                @change="updateOrderStatus"
+                class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              >
+                <option value="">Update Status</option>
+                <option value="processing">Processing</option>
+                <option value="shipped">Shipped</option>
+                <option value="delivered">Delivered</option>
+                <option value="cancelled">Cancel Order</option>
+              </select>
             </div>
           </div>
         </div>
 
-        <div class="col-span-1">
-          <h2 class="text-lg text-green-700 mb-4">Address</h2>
-          <div class="bg-white rounded-lg p-6">
-            <div class="space-y-4">
-              <!-- Shipping Details -->
-              <div>
-                <p class="text-xs uppercase text-green-700 mb-4">Customer</p>
-                <div class="flex items-center space-x-2 mb-2">
-                  <AppIcon icon="bx:user" class="w-5 h-5 text-green-700" />
-                  <p>{{ order.user || "Not Provided" }}</p>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Left Column -->
+          <div class="lg:col-span-2 space-y-6">
+            <!-- Order Items -->
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+              <div class="p-6 border-b border-gray-100">
+                <h2 class="text-lg font-semibold text-gray-900">Order Items</h2>
+              </div>
+              <div class="p-6">
+                <div class="space-y-4">
+                  <div
+                    v-for="product in orderItems"
+                    :key="product.id"
+                    class="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                  >
+                    <div class="flex items-center space-x-4 flex-1">
+                      <div
+                        class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center"
+                      >
+                        <img
+                          v-if="product.product_image"
+                          :src="product.product_image"
+                          class="w-10 h-10 object-cover rounded"
+                          alt="Product image"
+                        />
+                        <AppIcon
+                          v-else
+                          icon="material-symbols:image"
+                          class="w-8 h-8 text-gray-400"
+                        />
+                      </div>
+                      <div class="flex-1">
+                        <h3 class="font-medium text-gray-900">
+                          {{ product.product_name }}
+                        </h3>
+                        <p class="text-sm text-gray-500">
+                          SKU: {{ product.product_id || "N/A" }}
+                        </p>
+                      </div>
+                    </div>
+                    <div class="text-right">
+                      <p class="font-semibold text-gray-900">
+                        {{ formatCurrency(product.amount) }}
+                      </p>
+                      <p class="text-sm text-gray-600">
+                        Qty: {{ product.quantity }}
+                      </p>
+                      <p class="text-lg font-bold text-green-600">
+                        {{ formatCurrency(product.amount * product.quantity) }}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div class="flex items-center space-x-2">
-                  <AppIcon
-                    icon="fluent:mail-24-regular"
-                    class="w-5 h-5 text-green-700"
-                  />
-                  <p>{{ order.email || "Not Provided" }}</p>
+
+                <!-- Order Summary -->
+                <div class="mt-6 pt-6 border-t border-gray-200">
+                  <div class="space-y-3">
+                    <div
+                      class="flex justify-between text-lg font-bold pt-3 border-t border-gray-200"
+                    >
+                      <span class="text-gray-900">Total</span>
+                      <span class="text-green-600">{{
+                        formatCurrency(order.total_amount)
+                      }}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <!-- Order Info -->
-              <div>
-                <h3 class="text-sm uppercase font-medium text-gray-700 mb-4">
-                  Shipping Address
-                </h3>
-                <div class="flex items-center space-x-2 mb-2">
-                  <AppIcon icon="bx:user" class="w-5 h-5 text-green-700" />
-                  <p>{{ order.user || "Not Provided" }}</p>
-                </div>
-                <div class="flex space-x-2 mb-2">
-                  <div class="w-10 h-10">
-                    <AppIcon
-                      icon="octicon:location-24"
-                      class="text-green-700"
-                    />
-                  </div>
-                  <p class="text-sm normal-case">
-                    {{ order.address || "Not Provided" }}
-                  </p>
-                </div>
+            </div>
+          </div>
+
+          <!-- Right Column -->
+          <div class="space-y-6">
+            <!-- Customer Information -->
+            <div class="bg-white rounded-xl shadow-sm p-6">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                Shipping Information
+              </h3>
+              <div class="space-y-2 text-sm">
+                <p>{{ order.user || "N/A" }}</p>
+                <p class="font-medium text-gray-900">
+                  {{ order.address || "N/A" }}
+                </p>
               </div>
             </div>
           </div>
@@ -142,89 +185,173 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { getSingleOrder } from "../services/auth.auth.service";
 import { useToast } from "vue-toastification";
+import { getSingleOrder } from "../services/auth.auth.service"; // Existing service
+// Assume an API service for updating order status
+import { updateOrderStatusAPI } from "../services/auth.auth.service";
 
 export default {
-  name: "SingleOrder",
+  name: "OrderDetailView",
   setup() {
     const route = useRoute();
     const router = useRouter();
     const toast = useToast();
+
     const isLoading = ref(false);
-    const order = ref({ products: [] });
+    const errorMessage = ref("");
+    const order = ref({});
+    const newStatus = ref("");
+    const orderItems = ref([]);
+
+    const formatCurrency = (value) => {
+      if (!value) return "₦0.00";
+      return new Intl.NumberFormat("en-NG", {
+        style: "currency",
+        currency: "NGN",
+        minimumFractionDigits: 2,
+      }).format(value);
+    };
+
+    const formatDate = (dateString) => {
+      if (!dateString) return "N/A";
+      return new Date(dateString).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    };
+
+    const getStatusBadgeClass = (status) => {
+      const classes = {
+        success: "bg-green-100 text-green-800",
+        pending: "bg-yellow-100 text-yellow-800",
+        processing: "bg-blue-100 text-blue-800",
+        shipped: "bg-purple-100 text-purple-800",
+        delivered: "bg-green-100 text-green-800",
+        cancelled: "bg-red-100 text-red-800",
+      };
+      return classes[status] || "bg-gray-100 text-gray-800";
+    };
+
+    const getStatusText = (status) => {
+      const texts = {
+        success: "Success",
+        pending: "Pending",
+        processing: "Processing",
+        shipped: "Shipped",
+        delivered: "Delivered",
+        cancelled: "Cancelled",
+      };
+      return texts[status] || status;
+    };
+
+    const canEditOrder = (status) => {
+      const editableStatuses = ["pending", "processing"];
+      return editableStatuses.includes(status);
+    };
+
+    const canUpdateStatus = (status) => {
+      const updatableStatuses = ["pending", "processing", "shipped"];
+      return updatableStatuses.includes(status);
+    };
 
     const fetchOrder = async () => {
       isLoading.value = true;
+      errorMessage.value = "";
       const orderId = route.params.id;
       if (!orderId) {
-        toast.error("Order ID is missing!");
+        errorMessage.value = "Order ID is missing!";
+        toast.error(errorMessage.value);
+        isLoading.value = false;
         return;
       }
       try {
         const response = await getSingleOrder(orderId);
-        order.value = response.data;
+        order.value = response.data || {};
+        orderItems.value = response.data.products || [];
       } catch (err) {
-        toast.error("Failed to fetch order details.");
+        errorMessage.value = "Failed to fetch order details. Please try again.";
+        toast.error(errorMessage.value);
+        console.error("Fetch order error:", err);
       } finally {
         isLoading.value = false;
       }
     };
 
-    const formatDate = (dateString) => {
-      if (!dateString) return "Not Provided";
-      const date = new Date(dateString);
-      return date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+    const updateOrderStatus = async () => {
+      if (!newStatus.value) return;
+      isLoading.value = true;
+      errorMessage.value = "";
+      try {
+        await updateOrderStatusAPI(order.value.id, newStatus.value);
+        order.value.status = newStatus.value;
+        toast.success(
+          `Order status updated to ${getStatusText(newStatus.value)}`
+        );
+        newStatus.value = ""; // Reset the select input
+      } catch (err) {
+        errorMessage.value = "Failed to update order status. Please try again.";
+        toast.error(errorMessage.value);
+        console.error("Update status error:", err);
+      } finally {
+        isLoading.value = false;
+      }
     };
 
-    const goBack = () => {
-      router.go(-1); // Navigate to the previous page in history
+    const editOrder = () => {
+      router.push(`/orders/${order.value.id}/edit`);
     };
 
-    fetchOrder();
+    const printOrder = () => {
+      window.print();
+    };
+
+    onMounted(() => {
+      fetchOrder();
+    });
 
     return {
       isLoading,
+      errorMessage,
       order,
+      newStatus,
+      orderItems,
+      formatCurrency,
       formatDate,
-      goBack,
+      getStatusBadgeClass,
+      getStatusText,
+      canEditOrder,
+      canUpdateStatus,
+      editOrder,
+      printOrder,
+      updateOrderStatus,
     };
   },
 };
 </script>
 
 <style scoped>
-.table-auto th,
-.table-auto td {
-  padding: 0.75rem 0;
-}
-
-.transition-colors {
-  transition: background-color 0.2s ease-in-out;
-}
-
-.rounded-full {
-  border-radius: 9999px;
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
+@media print {
+  .no-print {
+    display: none !important;
   }
-  100% {
-    transform: rotate(360deg);
+
+  body {
+    background: white !important;
+  }
+
+  .bg-gray-50 {
+    background: white !important;
+  }
+
+  .shadow-sm {
+    box-shadow: none !important;
+  }
+
+  .border {
+    border: 1px solid #e5e7eb !important;
   }
 }
 </style>

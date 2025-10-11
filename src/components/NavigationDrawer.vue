@@ -8,9 +8,9 @@
       <div class="flex flex-col">
         <div
           @click="$emit('close-drawer')"
-          class="lg:hidden self-end pr-4 cursor-pointer hover:bg-white/20 rounded-full transition"
+          class="lg:hidden self-end flex items-center p-2 cursor-pointer hover:bg-white/20 rounded-full transition"
         >
-          <img src="/icons/close.svg" alt="close" class="w-6 h-6" />
+          <AppIcon icon="mdi:close" class="w-6 h-6" />
         </div>
         <div class="pl-6 mb-4">
           <h2 class="text-xl font-bold tracking-wide">Chi Icon</h2>
@@ -98,17 +98,47 @@ export default {
     const activeDropdown = ref(null);
 
     const navItems = [
-      { text: "Dashboard", icon: "si:dashboard-fill", path: "/dashboard" },
+      {
+        text: "Dashboard",
+        icon: "material-symbols:dashboard",
+        path: "/dashboard",
+      },
       {
         text: "Products",
-        icon: "raphael:package",
+        icon: "material-symbols:inventory-2",
         children: [
-          { text: "All Products", path: "/products" },
-          { text: "Add Product", path: "/addproducts" },
+          {
+            text: "All Products",
+            path: "/products",
+            icon: "material-symbols:view-list",
+          },
+          {
+            text: "Add Product",
+            path: "/addproducts",
+            icon: "material-symbols:add-box",
+          },
         ],
       },
-      { text: "Customers", icon: "fa-solid:users", path: "/customers" },
-      { text: "Categories", icon: "ic:baseline-category", path: "/category" },
+      {
+        text: "Customers",
+        icon: "material-symbols:group",
+        path: "/customers",
+      },
+      {
+        text: "Categories",
+        icon: "material-symbols:category",
+        path: "/category",
+      },
+      {
+        text: "Orders",
+        icon: "material-symbols:shopping-cart",
+        path: "/orders",
+      },
+      {
+        text: "Settings",
+        icon: "material-symbols:settings",
+        path: "/settings",
+      },
     ];
 
     const toggleDropdown = (index) => {

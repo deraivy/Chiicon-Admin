@@ -13,6 +13,7 @@ import Customers from "@/views/Customers.vue";
 import ViewCustomer from "@/views/viewCustomer.vue";
 import SingleOrder from "@/views/singleOrder.vue";
 import Invoice from "@/components/invoice.vue";
+import Orders from "@/views/orders.vue";
 
 const routes = [
   {
@@ -79,14 +80,20 @@ const routes = [
     meta: { requiresAuth: true, noNavbar: false },
   },
   {
+    path: "/orders",
+    name: "orders",
+    component: Orders,
+    meta: { requiresAuth: true, noNavbar: false },
+  },
+  {
     path: "/viewcustomer/:id",
     name: "viewcustomer",
     component: ViewCustomer,
     meta: { requiresAuth: true, noNavbar: false },
   },
   {
-    path: "/order/:id",
-    name: "order",
+    path: "/single-order/:id",
+    name: "single-order",
     component: SingleOrder,
     meta: { requiresAuth: true, noNavbar: false },
     props: true,
